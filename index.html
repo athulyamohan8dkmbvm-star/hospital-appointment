@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Appointment System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef4ff;
+        }
+
+        header {
+            background: #1769aa;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1769aa;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #aaa;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 7px;
+            background: #1769aa;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0d4f82;
+        }
+
+        .back {
+            background: #666;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            margin-top: 15px;
+            padding: 12px;
+            background: #ffe0e0;
+            color: #b00000;
+            border-radius: 7px;
+        }
+
+        .success {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e1f7e8;
+            color: #176b35;
+            border-radius: 8px;
+        }
+
+        .info {
+            padding: 12px;
+            background: #e8f2ff;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+
+        .link {
+            text-align: center;
+            color: #1769aa;
+            margin-top: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🏥 Hospital Appointment System</h1>
+</header>
+
+<div class="container" id="loginPage">
+    <h2>Customer Login</h2>
+
+    <div class="info">
+        Enter your registered phone number.
+    </div>
+
+    <label>Phone Number</label>
+    <input type="tel" id="loginPhone" maxlength="10"
+           placeholder="10 digit phone number">
+
+    <div id="loginError"></div>
+
+    <button onclick="login()">Continue</button>
+
+    <div class="link" onclick="showRegister()">
+        New patient? Register here
+    </div>
+</div>
+
+
+<div class="container hidden" id="registerPage">
+    <h2>Patient Registration</h2>
+
+    <label>Full Name</label>
+    <input type="text" id="name" placeholder="Enter full name">
+
+    <label>Date of Birth</label>
+    <input type="date" id="dob">
+
+    <label>Phone Number</label>
+    <input type="tel" id="phone" maxlength="10"
+           placeholder="10 digit phone number">
+
+    <label>Gender</label>
+    <select id="gender">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <div id="registerError"></div>
+
+    <button onclick="registerPatient()">Register & Continue</button>
+    <button class="back" onclick="showLogin()">Back</button>
+</div>
+
+
+<div class="container hidden" id="hospitalPage">
+    <h2>Select Hospital</h2>
+
+    <div class="info">
+        Welcome, <strong id="welcomeName"></strong>
+    </div>
+
+    <label>District</label>
+    <select id="district" onchange="loadHospitals()">
+        <option value="">Select District</option>
+    </select>
+
+    <label>Hospital</label>
+    <select id="hospital">
+        <option value="">Select Hospital</option>
+    </select>
+
+    <div id="hospitalError"></div>
+
+    <button onclick="nextDepartment()">Next</button>
+</div>
+
+
+<div class="container hidden" id="departmentPage">
+    <h2>Department & Doctor</h2>
+
+    <div class="info">
+        Hospital: <strong id="hospitalName"></strong>
+    </div>
+
+    <label>Department</label>
+    <select id="department" onchange="loadDoctors()">
+        <option value="">Select Department</option>
+    </select>
+
+    <label>Doctor</label>
+    <select id="doctor">
+        <option value="">Select Doctor</option>
+    </select>
+
+    <div id="departmentError"></div>
+
+    <button onclick="nextAppointment()">Next</button>
+</div>
+
+
+<div class="container hidden" id="appointmentPage">
+    <h2>Book Appointment</h2>
+
+    <div class="info">
+        <p>Hospital: <strong id="summaryHospital"></strong></p>
+        <p>Department: <strong id="summaryDepartment"></strong></p>
+        <p>Doctor: <strong id="summaryDoctor"></strong></p>
+    </div>
+
+    <label>Appointment Date</label>
+    <input type="date" id="appointmentDate">
+
+    <label>Appointment Time</label>
+    <input type="time" id="appointmentTime">
+
+    <div id="appointmentError"></div>
+
+    <button onclick="bookAppointment()">Book Appointment</button>
+</div>
+
+
+<div class="container hidden" id="successPage">
+    <h2>✅ Appointment Confirmed</h2>
+
+    <div class="success" id="appointmentDetails"></div>
+
+    <button onclick="downloadPatients()">
+        Download Patient CSV
+    </button>
+
+    <button onclick="downloadAppointments()">
+        Download Appointment CSV
+    </button>
+
+    <button class="back" onclick="logout()">Logout</button>
+</div>
+
+
+<script>
+
+const hospitalData = {
+    "Thiruvananthapuram": {
+        "Government Medical College Thiruvananthapuram": {
+            "Cardiology": ["Dr. Arun Kumar", "Dr. Meera Nair"],
+            "General Medicine": ["Dr. Rahul Menon", "Dr. Anjali S"],
+            "Pediatrics": ["Dr. Priya Thomas", "Dr. Vivek Raj"]
+        }
+    },
+
+    "Kollam": {
+        "Government Medical College Kollam": {
+            "Cardiology": ["Dr. Suresh Kumar", "Dr. Neha Raj"],
+            "General Medicine": ["Dr. Manu Joseph", "Dr. Anu Maria"],
+            "Pediatrics": ["Dr. Kavya S", "Dr. Ajith Kumar"]
+        }
+    },
+
+    "Pathanamthitta": {
+        "General Hospital Pathanamthitta": {
+            "Cardiology": ["Dr. Hari Krishnan", "Dr. Lakshmi P"],
+            "General Medicine": ["Dr. Nikhil R", "Dr. Reshma K"]
+        }
+    },
+
+    "Alappuzha": {
+        "Government Medical College Alappuzha": {
+            "Cardiology": ["Dr. Thomas Mathew", "Dr. Sneha P"],
+            "General Medicine": ["Dr. Vishnu Raj", "Dr. Maria Joseph"],
+            "Pediatrics": ["Dr. Athira S", "Dr. Rahul P"]
+        }
+    },
+
+    "Kottayam": {
+        "Government Medical College Kottayam": {
+            "Cardiology": ["Dr. Joseph Thomas", "Dr. Meera Jose"],
+            "General Medicine": ["Dr. Akhil K", "Dr. Neethu S"]
+        }
+    },
+
+    "Idukki": {
+        "District Hospital Idukki": {
+            "General Medicine": ["Dr. Manoj P", "Dr. Anitha R"],
+            "Pediatrics": ["Dr. Fathima K", "Dr. Hari S"]
+        }
+    },
+
+    "Ernakulam": {
+        "Government Medical College Ernakulam": {
+            "Cardiology": ["Dr. Rajeev Menon", "Dr. Deepa Nair"],
+            "General Medicine": ["Dr. Abhilash P", "Dr. Anjali Menon"],
+            "Pediatrics": ["Dr. Sreeja K", "Dr. Naveen R"]
+        }
+    },
+
+    "Thrissur": {
+        "Government Medical College Thrissur": {
+            "Cardiology": ["Dr. Vinod Kumar", "Dr. Arya S"],
+            "General Medicine": ["Dr. Amal Thomas", "Dr. Greeshma P"]
+        }
+    },
+
+    "Palakkad": {
+        "District Hospital Palakkad": {
+            "General Medicine": ["Dr. Santhosh K", "Dr. Divya R"],
+            "Pediatrics": ["Dr. Ramesh P", "Dr. Anu K"]
+        }
+    },
+
+    "Malappuram": {
+        "Government Medical College Manjeri": {
+            "Cardiology": ["Dr. Basheer K", "Dr. Fathima M"],
+            "General Medicine": ["Dr. Shafi P", "Dr. Riya S"]
+        }
+    },
+
+    "Kozhikode": {
+        "Government Medical College Kozhikode": {
+            "Cardiology": ["Dr. Sameer K", "Dr. Asha N"],
+            "General Medicine": ["Dr. Niyas P", "Dr. Athira M"],
+            "Pediatrics": ["Dr. Farhan K", "Dr. Sneha R"]
+        }
+    },
+
+    "Wayanad": {
+        "District Hospital Wayanad": {
+            "General Medicine": ["Dr. Sajin P", "Dr. Maya K"],
+            "Pediatrics": ["Dr. Rahul S", "Dr. Anitha P"]
+        }
+    },
+
+    "Kannur": {
+        "Government Medical College Kannur": {
+            "Cardiology": ["Dr. Pradeep K", "Dr. Lakshmi N"],
+            "General Medicine": ["Dr. Jithin P", "Dr. Remya S"]
+        }
+    },
+
+    "Kasaragod": {
+        "General Hospital Kasaragod": {
+            "General Medicine": ["Dr. Anoop K", "Dr. Hema R"],
+            "Pediatrics": ["Dr. Nisha P", "Dr. Arun S"]
+        }
+    }
+};
+
+
+let currentPatient = null;
+
+let selectedDistrict = "";
+let selectedHospital = "";
+let selectedDepartment = "";
+let selectedDoctor = "";
+
+
+function hideAll() {
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("registerPage").classList.add("hidden");
+    document.getElementById("hospitalPage").classList.add("hidden");
+    document.getElementById("departmentPage").classList.add("hidden");
+    document.getElementById("appointmentPage").classList.add("hidden");
+    document.getElementById("successPage").classList.add("hidden");
+}
+
+
+function showLogin() {
+    hideAll();
+    document.getElementById("loginPage").classList.remove("hidden");
+}
+
+
+function showRegister() {
+    hideAll();
+    document.getElementById("registerPage").classList.remove("hidden");
+
+    document.getElementById("phone").value =
+        document.getElementById("loginPhone").value;
+}
+
+
+function login() {
+
+    const phone =
+        document.getElementById("loginPhone").value.trim();
+
+    const error =
+        document.getElementById("loginError");
+
+    error.innerHTML = "";
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        error.innerHTML =
+            '<div class="error">Enter a valid 10 digit phone number.</div>';
+        return;
+    }
+
+    const patients =
+        JSON.parse(localStorage.getItem("patients")) || [];
+
+    const patient =
+        patients.find(function(item) {
+            return item.phone === phone;
+        });
+
+    if (!patient) {
+        showRegister();
+        document.getElementById("phone").value = phone;
+        return;
+    }
+
+    currentPatient = patient;
+    showHospitalPage();
+}
+
+
+function registerPatient() {
+
+    const name =
+        document.getElementById("name").value.trim();
+
+    const dob =
+        document.getElementById("dob").value;
+
+    const phone =
+        document.getElementById("phone").value.trim();
+
+    const gender =
+        document.getElementById("gender").value;
+
+    const error =
+        document.getElementById("registerError");
+
+    error.innerHTML = "";
+
+    if (name === "" || dob === "" || phone === "" || gender === "") {
+        error.innerHTML =
+            '<div class="error">Please fill all fields.</div>';
+        return;
+    }
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        error.innerHTML =
+            '<div class="error">Phone number must contain 10 digits.</div>';
+        return;
+    }
+
+    const patients =
+        JSON.parse(localStorage.getItem("patients")) || [];
+
+    const alreadyExists =
+        patients.some(function(item) {
+            return item.phone === phone;
+        });
+
+    if (alreadyExists) {
+        error.innerHTML =
+            '<div class="error">This phone number is already registered.</div>';
+        return;
+    }
+
+    const patient = {
+        name: name,
+        dob: dob,
+        phone: phone,
+        gender: gender
+    };
+
+    patients.push(patient);
+
+    localStorage.setItem(
+        "patients",
+        JSON.stringify(patients)
+    );
+
+    currentPatient = patient;
+
+    showHospitalPage();
+}
+
+
+function showHospitalPage() {
+
+    hideAll();
+
+    document.getElementById("hospitalPage")
+        .classList.remove("hidden");
+
+    document.getElementById("welcomeName")
+        .textContent = currentPatient.name;
+
+    const district =
+        document.getElementById("district");
+
+    district.innerHTML =
+        '<option value="">Select District</option>';
+
+    Object.keys(hospitalData).forEach(function(name) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = name;
+        option.textContent = name;
+
+        district.appendChild(option);
+    });
+}
+
+
+function loadHospitals() {
+
+    const district =
+        document.getElementById("district").value;
+
+    const hospital =
+        document.getElementById("hospital");
+
+    hospital.innerHTML =
+        '<option value="">Select Hospital</option>';
+
+    if (district === "") {
+        return;
+    }
+
+    Object.keys(hospitalData[district])
+        .forEach(function(name) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = name;
+            option.textContent = name;
+
+            hospital.appendChild(option);
+        });
+}
+
+
+function nextDepartment() {
+
+    const district =
+        document.getElementById("district").value;
+
+    const hospital =
+        document.getElementById("hospital").value;
+
+    const error =
+        document.getElementById("hospitalError");
+
+    error.innerHTML = "";
+
+    if (district === "" || hospital === "") {
+        error.innerHTML =
+            '<div class="error">Please select district and hospital.</div>';
+        return;
+    }
+
+    selectedDistrict = district;
+    selectedHospital = hospital;
+
+    const department =
+        document.getElementById("department");
+
+    department.innerHTML =
+        '<option value="">Select Department</option>';
+
+    Object.keys(hospitalData[district][hospital])
+        .forEach(function(name) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = name;
+            option.textContent = name;
+
+            department.appendChild(option);
+        });
+
+    document.getElementById("hospitalName")
+        .textContent = hospital;
+
+    hideAll();
+
+    document.getElementById("departmentPage")
+        .classList.remove("hidden");
+}
+
+
+function loadDoctors() {
+
+    const department =
+        document.getElementById("department").value;
+
+    const doctor =
+        document.getElementById("doctor");
+
+    doctor.innerHTML =
+        '<option value="">Select Doctor</option>';
+
+    if (department === "") {
+        return;
+    }
+
+    const doctors =
+        hospitalData[selectedDistrict]
+        [selectedHospital]
+        [department];
+
+    doctors.forEach(function(name) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = name;
+        option.textContent = name;
+
+        doctor.appendChild(option);
+    });
+}
+
+
+function nextAppointment() {
+
+    const department =
+        document.getElementById("department").value;
+
+    const doctor =
+        document.getElementById("doctor").value;
+
+    const error =
+        document.getElementById("departmentError");
+
+    error.innerHTML = "";
+
+    if (department === "" || doctor === "") {
+        error.innerHTML =
+            '<div class="error">Please select department and doctor.</div>';
+        return;
+    }
+
+    selectedDepartment = department;
+    selectedDoctor = doctor;
+
+    document.getElementById("summaryHospital")
+        .textContent = selectedHospital;
+
+    document.getElementById("summaryDepartment")
+        .textContent = selectedDepartment;
+
+    document.getElementById("summaryDoctor")
+        .textContent = selectedDoctor;
+
+    setMinimumDate();
+
+    hideAll();
+
+    document.getElementById("appointmentPage")
+        .classList.remove("hidden");
+}
+
+
+function setMinimumDate() {
+
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    const month =
+        String(today.getMonth() + 1).padStart(2, "0");
+
+    const day =
+        String(today.getDate()).padStart(2, "0");
+
+    document.getElementById("appointmentDate").min =
+        year + "-" + month + "-" + day;
+}
+
+
+function bookAppointment() {
+
+    const date =
+        document.getElementById("appointmentDate").value;
+
+    const time =
+        document.getElementById("appointmentTime").value;
+
+    const error =
+        document.getElementById("appointmentError");
+
+    error.innerHTML = "";
+
+    if (date === "" || time === "") {
+        error.innerHTML =
+            '<div class="error">Please select date and time.</div>';
+        return;
+    }
+
+    const appointment = {
+
+        name: currentPatient.name,
+
+        dob: currentPatient.dob,
+
+        phone: currentPatient.phone,
+
+        gender: currentPatient.gender,
+
+        district: selectedDistrict,
+
+        hospital: selectedHospital,
+
+        department: selectedDepartment,
+
+        doctor: selectedDoctor,
+
+        date: date,
+
+        time: time
+    };
+
+    const appointments =
+        JSON.parse(localStorage.getItem("appointments")) || [];
+
+    appointments.push(appointment);
+
+    localStorage.setItem(
+        "appointments",
+        JSON.stringify(appointments)
+    );
+
+    showConfirmation(appointment);
+}
+
+
+function showConfirmation(appointment) {
+
+    hideAll();
+
+    document.getElementById("successPage")
+        .classList.remove("hidden");
+
+    document.getElementById("appointmentDetails")
+        .innerHTML =
+        "<p><strong>Patient:</strong> " +
+        appointment.name +
+        "</p>" +
+
+        "<p><strong>Phone:</strong> " +
+        appointment.phone +
+        "</p>" +
+
+        "<p><strong>Gender:</strong> " +
+        appointment.gender +
+        "</p>" +
+
+        "<p><strong>District:</strong> " +
+        appointment.district +
+        "</p>" +
+
+        "<p><strong>Hospital:</strong> " +
+        appointment.hospital +
+        "</p>" +
+
+        "<p><strong>Department:</strong> " +
+        appointment.department +
+        "</p>" +
+
+        "<p><strong>Doctor:</strong> " +
+        appointment.doctor +
+        "</p>" +
+
+        "<p><strong>Date:</strong> " +
+        appointment.date +
+        "</p>" +
+
+        "<p><strong>Time:</strong> " +
+        appointment.time +
+        "</p>";
+}
+
+
+function downloadFile(content, filename) {
+
+    const blob =
+        new Blob([content], {
+            type: "text/csv;charset=utf-8;"
+        });
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+}
+
+
+function downloadPatients() {
+
+    const patients =
+        JSON.parse(localStorage.getItem("patients")) || [];
+
+    if (patients.length === 0) {
+        alert("No patient data found.");
+        return;
+    }
+
+    let csv =
+        "Name,DOB,Phone,Gender\n";
+
+    patients.forEach(function(patient) {
+
+        csv +=
+            '"' + patient.name + '",' +
+            '"' + patient.dob + '",' +
+            '"' + patient.phone + '",' +
+            '"' + patient.gender + '"\n';
+    });
+
+    downloadFile(csv, "patients.csv");
+}
+
+
+function downloadAppointments() {
+
+    const appointments =
+        JSON.parse(localStorage.getItem("appointments")) || [];
+
+    if (appointments.length === 0) {
+        alert("No appointment data found.");
+        return;
+    }
+
+   let csv =
+    "Name,DOB,Phone,Gender,District,Hospital,Department,Doctor,Date,Time\n";
+
+appointments.forEach(function(item) {
+
+    csv +=
+        '"' + item.name + '",' +
+        '"' + item.dob + '",' +
+        '"' + item.phone + '",' +
+        '"' + item.gender + '",' +
+        '"' + item.district + '",' +
+        '"' + item.hospital + '",' +
+        '"' + item.department + '",' +
+        '"' + item.doctor + '",' +
+        '"' + item.date + '",' +
+        '"' + item.time + '"\n';
+});
+
+downloadFile(csv, "appointments.csv");
+}
+
+function logout() {
+
+    currentPatient = null;
+
+    selectedDistrict = "";
+    selectedHospital = "";
+    selectedDepartment = "";
+    selectedDoctor = "";
+
+    document.getElementById("loginPhone").value = "";
+
+    showLogin();
+}
+
+</script>
+
+</body>
+</html>
